@@ -4,6 +4,7 @@ require 'rest-client'
 require 'json'
 require 'pry'
 require 'pry-nav'
+require 'logger'
 
 set :database, { adapter: "sqlite3", database: "db/development.sqlite3" }
 
@@ -24,15 +25,23 @@ class Attendance < ActiveRecord::Base
 end
 
 def user_exists?(user_id)
-  response = RestClient.get("http://localhost:5000/users/#{user_id}")
+  response = RestClient.get("http://localhost:8000/users/#{user_id}", { content_type: :json })
   response.code == 200
 rescue RestClient::NotFound
+  false
+rescue RestClient::ExceptionWithResponse => err
   false
 end
 
 # routes
 get '/courses' do
   Course.all.to_json
+end
+
+get '/courses/:id' do
+  course = Course.find(params[:id])
+
+  course.to_json
 end
 
 post '/courses' do
@@ -120,8 +129,14 @@ end
 
 post "/attendances" do
   data = JSON.parse(request.body.read)
-  attendance = Attendance.new(data["attendance"])
+  payload = data["attendance"]
+  attendance = Attendance.new(payload)
   
+  unless user_exists?(payload["user_id"])
+    status 422
+    return { message: 'Error check user_id' }.to_json
+  end
+
   if attendance.save
     status 201
     attendance.to_json
