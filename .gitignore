@@ -1,0 +1,3 @@
+users_python_web/.venv/*
+.env
+.env.*
