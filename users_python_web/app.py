@@ -1,10 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from http import HTTPStatus
-from flask_cors import CORS, cross_origin
 
 application = Flask(__name__)
-cors = CORS(application, resources={r"/*": {"origins": "*"}})
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/users.sqlite3'
 database = SQLAlchemy(application)
 
@@ -78,4 +76,4 @@ with application.app_context():
 
 
 if __name__ == '__main__':
-  application.run(debug=True)
+  application.run(port=8000,debug=True)
