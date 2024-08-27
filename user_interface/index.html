@@ -7,21 +7,175 @@
     <meta name="keywords" content="cursos, ruby, flask, python, golang, sinatra, java, springboot" >
     <meta name="description" content="Curso de desenvolvimento de software ensinando redes e integrando os sistemas" >
     <title>Course HTML skill.dev</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.6/base.min.css" rel="stylesheet" />
-  </head>
-  <body>
-    <h1 class="text-3xl font-bold underline">
-      Hello world!
-    </h1>
-    <form action="/action_page.php">
-      <input type="radio" id="html" name="fav_language" value="HTML">
-      <label for="html">HTML</label><br>
-      <input type="input" id="css" name="fav_language" value="CSS">
-      <label for="css">CSS</label><br>
-      <input type="text" id="javascript" name="fav_language" value="JavaScript">
-      <label for="javascript">JavaScript</label><br><br>
-      <input type="submit" value="Submit">
-    </form>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet" >
     <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  
+  <body class="bg-gray-100 text-gray-800">
+    <div id="all-content" class="flex">
+      <div id="menu" class="sidebar">
+        <h2>Menu</h2>
+        <button class="tablink active-tab w-full mb-2" onclick="openTab(event, 'users')"><i class="fas fa-user"></i> Users</button>
+        <button class="tablink w-full mb-2" onclick="openTab(event, 'courses')"><i class="fas fa-book"></i> Courses</button>
+        <button class="tablink w-full mb-2" onclick="openTab(event, 'lessons')"><i class="fas fa-chalkboard-teacher"></i> Lessons</button>
+        <button class="tablink w-full mb-2" onclick="openTab(event, 'attendances')"><i class="fas fa-calendar-check"></i> Attendances</button>
+        <button class="tablink w-full mb-2" onclick="openTab(event, 'scores')"><i class="fas fa-star"></i> Scores</button>
+      </div>
+      
+      <main class="content">
+        <h1 class="text-3xl font-bold mb-4">Course Management System</h1>
+        <div id="edit-success" class="success invisible"></div>
+        <div id="edit-error" class="error invisible"></div>
+
+        <section id="users" class="tabcontent">
+          <h2 class="text-gray-800">Users</h2>
+          <button class="btn mb-4" onclick="showUserForm()">Add New User</button>
+          <form id="user-form" class="hidden">
+            <label for="user-name">Name</label>
+            <input type="text" id="user-name" placeholder="Typing name" class="input-field" />
+            <label for="user-email">E-mail</label>
+            <input type="email" name="user" id="user-email" value="" placeholder="Typing E-mail" class="input-field" />
+            <button type="submit" class="btn">Add User</button>
+          </form>
+
+          <div id="user-errors" class="error mt-2"></div>
+          <div id="user-success" class="success mt-2"></div>
+          <table id="user-list" class="min-w-full bg-white border"></table>
+        </section>
+
+        <section id="courses" class="tabcontent hidden">
+          <h1 class="text-gray-800">courses</h1>
+        </section>
+
+        <section id="lessons" class="tabcontent hidden">
+          <h1 class="text-gray-800">lessons</h1>
+        </section>
+
+        <section id="attendances" class="tabcontent hidden">
+          <h1 class="text-gray-800">attendances</h1>
+        </section>
+
+        <section id="scores" class="tabcontent hidden">
+          <h1 class="text-gray-800">scores</h1>
+        </section>
+
+
+      </main>
+    </div>
+
+    <script>
+
+      const BASE_URL = "http://localhost:8087";
+
+      // openTab begin
+      function openTab(event, tabName) {
+        const tabContents = document.getElementsByClassName('tabcontent');
+        const tabLinks = document.getElementsByClassName('tablink');
+
+        for(let position = 0; position < tabContents.length; position++){
+          tabContents[position].style.display = 'none';
+        }
+
+
+        for(let position = 0; position < tabLinks.length; position++){
+          tabLinks[position].className = tabLinks[position].className.replace(' active-tab', "");
+        }
+
+        document.getElementById(tabName).style.display = 'block';
+        event.currentTarget.className += ' active-tab';
+      }
+      // openTab end
+
+      // showUserForm() begin
+        function showUserForm() {
+          document.getElementById('user-form').classList.toggle('hidden');
+        }
+      // showUserForm() end
+
+      // Form submissions begin
+        document.getElementById("user-form").onsubmit = (event) => { 
+          handleSubmit(event,"/users",["user-name", "user-email"],"user-list") 
+        };
+      // form subsmisions end
+
+      // handleSubmit begin
+        async function handleSubmit(event, path, fields, listId, selectIds = []) {
+          event.preventDefault();
+          const formData = {};
+
+          fields.forEach(field => {
+            const element = document.getElementById(field);
+
+            if(element) {
+              const listReplaced = `${listId.split('-')[0]}`
+              const fieldReplace = field.replace(listReplaced, '');
+              formData[field] = element.value;
+            }
+          });
+
+          try {
+            await fetch(`${BASE_URL}${path}`, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                name: formData['user-name'],
+                email: formData['user-email']
+              })
+            });
+            fetchData(path, listId);
+            fields.forEach( field => {
+              document.getElementById(field).value = '';
+            });
+
+            selectIds.forEach( selectId => {
+              fetchData(path, selectId);
+            });
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        }
+      // handleSubmit end
+    
+      // fetchData begin
+        async function fetchData(path, listId, selectId = null) {
+          try {
+            const response = await fetch(`${BASE_URL}${path}`);
+            const data = await response.json();
+            const listElement = document.getElementById(listId);
+
+            let tableHeader = '';
+            switch(listId) {
+              case 'user-list':
+                tableHeader = `
+                <thead>
+                  <tr>
+                    <th class="px-4 py-2">ID</th>
+                    <th class="px-4 py-2">Name</th>
+                    <th class="px-4 py-2">Email</th>
+                    <th class="px-4 py-2">Action</th>
+                  </tr>
+                </thead>
+                `;
+                break;
+              default:
+                break;
+            }
+
+            listElement.innerHTML = tableHeader;
+
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        }
+      // fetchData end
+
+
+      // fetch data on page load
+      fetchData('/users', 'user-list');
+    </script>
   </body>
 </html>

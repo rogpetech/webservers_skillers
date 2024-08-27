@@ -10,6 +10,9 @@ import (
 
 func main() {
 	router := gin.Default()
+
+	// CORS
+	router.Use(corsMiddleware())
 	router.GET("/ping", func(context *gin.Context) {
 		context.JSON(http.StatusOK, gin.H{
 			"message": "pong",
@@ -85,5 +88,21 @@ func proxyRequest(url string) gin.HandlerFunc {
 		}
 
 		ctx.Data(resp.StatusCode(), resp.Header().Get("Content-Type"), resp.Body())
+	}
+}
+
+func corsMiddleware() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		context.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		context.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		context.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		context.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept, X-Requested-With, Authrization")
+
+		if context.Request.Method == "OPTIONS" {
+			context.AbortWithStatus(204)
+			return
+		}
+
+		context.Next()
 	}
 }
