@@ -48,7 +48,11 @@
         </section>
 
         <section id="courses" class="tabcontent hidden">
-          <h1 class="text-gray-800">courses</h1>
+          <h2 class="text-gray-800">Courses</h2>
+
+          <div id="course-errors" class="error mt-2"></div>
+          <div id="course-success" class="success mt-2"></div>
+          <table id="course-list" class="min-w-full bg-white border"></table>
         </section>
 
         <section id="lessons" class="tabcontent hidden">
@@ -166,6 +170,38 @@
             }
 
             listElement.innerHTML = tableHeader;
+
+            data.forEach( item => {
+              const row = document.createElement('tr');
+
+              switch(listId) {
+                case 'user-list':
+                  row.innerHTML = `
+                    <td class="border px-4 py-2">${item.id}</td>
+                    <td class="border px-4 py-2">${item.name}</td>
+                    <td class="border px-4 py-2">${item.email}</td>
+                    <td class="border px-4 py-2">
+                      <button onclick="openEditModal('${path}', ${item.id})" class="btn">Edit</button>
+                      <button onclick="confirmDelete('${path}', ${item.id})" class="btn">Delete</button>
+                    </td>`;
+                    break;
+                default:
+                  break;
+              }
+
+              listElement.appendChild(row);
+            });
+
+            if(selectId) {
+              const selectElement = document.getElementById(selectId);
+              selectElement.innerHTML = '';
+              data.forEach( item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.text = item.name;
+                selectElement.appendChild(option);
+              });
+            }
 
           } catch (error) {
             console.error('Error:', error);

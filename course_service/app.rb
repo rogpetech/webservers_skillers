@@ -5,8 +5,10 @@ require 'json'
 require 'pry'
 require 'pry-nav'
 require 'logger'
+require 'dotenv/load'
 
 set :database, { adapter: "sqlite3", database: "db/development.sqlite3" }
+set :port, ENV['SINATRA_PORT']
 
 # Models
 class Course < ActiveRecord::Base

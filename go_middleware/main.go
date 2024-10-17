@@ -1,14 +1,24 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"strings"
+
+	"github.com/joho/godotenv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 )
 
 func main() {
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	router := gin.Default()
 
 	// CORS
@@ -53,8 +63,8 @@ func main() {
 	router.POST("/scores", proxyRequest("http://localhost:8080/scores"))
 	router.PUT("/scores/:id", proxyRequest("http://localhost:8080/scores/:id"))
 	router.DELETE("/scores/:id", proxyRequest("http://localhost:8080/scores/:id"))
-
-	router.Run(":8087")
+	port := fmt.Sprintf(":%s", os.Getenv("GO_PORT"))
+	router.Run(port)
 }
 
 func proxyRequest(url string) gin.HandlerFunc {
