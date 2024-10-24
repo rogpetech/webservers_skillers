@@ -48,7 +48,7 @@ end
 
 post '/courses' do
   data = JSON.parse(request.body.read)
-  course = Course.new(data["course"])
+  course = Course.new(data)
 
   if course.save
     status 201

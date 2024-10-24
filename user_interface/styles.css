@@ -63,3 +63,8 @@ main.content {
 .btn:hover {
   background-color: #2f855a;
 }
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}

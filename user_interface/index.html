@@ -12,7 +12,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
     <link href="styles.css" rel="stylesheet" >
-    <script src="https://cdn.tailwindcss.com"></script>
   </head>
   
   <body class="bg-gray-100 text-gray-800">
@@ -33,7 +32,7 @@
 
         <section id="users" class="tabcontent">
           <h2 class="text-gray-800">Users</h2>
-          <button class="btn mb-4" onclick="showUserForm()">Add New User</button>
+          <button class="btn mb-4" onclick="showFormById('user-form')">Add New User</button>
           <form id="user-form" class="hidden">
             <label for="user-name">Name</label>
             <input type="text" id="user-name" placeholder="Typing name" class="input-field" />
@@ -49,169 +48,138 @@
 
         <section id="courses" class="tabcontent hidden">
           <h2 class="text-gray-800">Courses</h2>
+         
+          <button class="btn mb-4" onclick="showFormById('course-form')">Add New Course</button>
 
+          <form id="course-form" class="hidden">
+            <label for="course-title">Title</label>
+            <input type="text" id="course-title" placeholder="Typing Title" class="input-field" />
+            <label for="course-description">Description</label>
+            <textarea id="course-description" class="input-field"></textarea>
+            <button type="submit" class="btn">Add Course</button>
+          </form>
+         
           <div id="course-errors" class="error mt-2"></div>
           <div id="course-success" class="success mt-2"></div>
           <table id="course-list" class="min-w-full bg-white border"></table>
         </section>
 
         <section id="lessons" class="tabcontent hidden">
-          <h1 class="text-gray-800">lessons</h1>
+          <h2 class="text-gray-800">lessons</h2>
+          <button class="btn mb-4" onclick="showFormById('lesson-form')">Add New Lesson</button>
+
+          <form id="lesson-form" class="hidden">
+           <label for="lesson-title">Title</label>
+           <input type="text" id="lesson-title" placeholder="Title" class="input-field" />
+           <label for="lesson-description"></label>
+           <textarea id="lesson-description" placeholder="Description" class="input-field"></textarea>
+           <label for="lesson-course-id">Course</label>
+           <select id="lesson-course-id" class="input-field"></select>
+           <button type="submit">Add Lesson</button>
+          </form>
+
+          <div id="lesson-errors" class="error mt-2"></div>
+          <div id="lesson-success" class="success mt-2"></div>
+          <table id="lesson-list" class="min-w-full bg-white border"></table>
         </section>
 
         <section id="attendances" class="tabcontent hidden">
-          <h1 class="text-gray-800">attendances</h1>
+          <h2 class="text-gray-800">Attendances</h2>
+          <button class="btn mb-4" onclick="showFormById('attendance-form')">Add New Attendances</button>
+
+          <form id="attendance-form" class="hidden">
+            <label for="attendance-course-id">Course</label>
+            <select id="attendance-course-id" class="input-field"></select>
+            <label for="attendance-user-id">User</label>
+            <select id="attendance-user-id" class="input-field"></select>
+           <button type="submit">Add Attendance</button>
+          </form>
+
+          <div id="attendance" class="error mt-2"></div>
+          <div id="attendance-success" class="success mt-2"></div>
+          <table id="attendance-list" class="min-w-full bg-white border"></table>
         </section>
 
         <section id="scores" class="tabcontent hidden">
-          <h1 class="text-gray-800">scores</h1>
+          <h1 class="text-gray-800">Scores</h1>
+          <button class="btn mb-4" onclick="showFormById('score-form')">Add New Score</button>
+
+          <form id="score-form" class="hidden">
+            <label for="score-user-id">User</label>
+            <select id="score-user-id" class="input-field"></select>
+            <label for="score-video">Video</label>
+            <input type="text" id="score-video" placeholder="Video" class="input-field" />
+            <label for="score-points">Points</label>
+            <input type="number" id="score-points" placeholder="Points" class="input-field" />
+           <button type="submit">Add Score</button>
+          </form>
+
+          <div id="score" class="error mt-2"></div>
+          <div id="score-success" class="success mt-2"></div>
+          <table id="score-list" class="min-w-full bg-white border"></table>
         </section>
 
 
+        <div id="deleteModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+          <div class="flex items-center justify-center min-h-screen px-4 text-center">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+              <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                  <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Delete Item</h3>
+                    <div class="mt-2">
+                      <form id="delete-form">
+                        <button id="confirmDelete" type="submit" class="btn">Delete</button>
+                        <button type="button" class="btn" onclick="closeModal('editModal')">Cancel</button>
+                      </form>
+                    </div>
+  
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        
+
+       
+      <div id="editModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4 text-center">
+          <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div class="sm:flex sm:items-start">
+                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                  
+                  <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Edit Item</h3>
+                  <div class="mt-2">
+                    <form id="edit-form">
+                      <button type="submit" class="btn">Update</button>
+                      <button type="button" class="btn" onclick="closeModal('editModal')">Cancel</button>
+                    </form>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       </main>
     </div>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="assets/javascript/menu.js"></script>
+    <script src="assets/javascript/form.js"></script>
 
     <script>
-
-      const BASE_URL = "http://localhost:8087";
-
-      // openTab begin
-      function openTab(event, tabName) {
-        const tabContents = document.getElementsByClassName('tabcontent');
-        const tabLinks = document.getElementsByClassName('tablink');
-
-        for(let position = 0; position < tabContents.length; position++){
-          tabContents[position].style.display = 'none';
-        }
-
-
-        for(let position = 0; position < tabLinks.length; position++){
-          tabLinks[position].className = tabLinks[position].className.replace(' active-tab', "");
-        }
-
-        document.getElementById(tabName).style.display = 'block';
-        event.currentTarget.className += ' active-tab';
-      }
-      // openTab end
-
-      // showUserForm() begin
-        function showUserForm() {
-          document.getElementById('user-form').classList.toggle('hidden');
-        }
-      // showUserForm() end
-
-      // Form submissions begin
-        document.getElementById("user-form").onsubmit = (event) => { 
-          handleSubmit(event,"/users",["user-name", "user-email"],"user-list") 
-        };
-      // form subsmisions end
-
-      // handleSubmit begin
-        async function handleSubmit(event, path, fields, listId, selectIds = []) {
-          event.preventDefault();
-          const formData = {};
-
-          fields.forEach(field => {
-            const element = document.getElementById(field);
-
-            if(element) {
-              const listReplaced = `${listId.split('-')[0]}`
-              const fieldReplace = field.replace(listReplaced, '');
-              formData[field] = element.value;
-            }
-          });
-
-          try {
-            await fetch(`${BASE_URL}${path}`, {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({
-                name: formData['user-name'],
-                email: formData['user-email']
-              })
-            });
-            fetchData(path, listId);
-            fields.forEach( field => {
-              document.getElementById(field).value = '';
-            });
-
-            selectIds.forEach( selectId => {
-              fetchData(path, selectId);
-            });
-          } catch (error) {
-            console.error('Error:', error);
-          }
-        }
-      // handleSubmit end
-    
-      // fetchData begin
-        async function fetchData(path, listId, selectId = null) {
-          try {
-            const response = await fetch(`${BASE_URL}${path}`);
-            const data = await response.json();
-            const listElement = document.getElementById(listId);
-
-            let tableHeader = '';
-            switch(listId) {
-              case 'user-list':
-                tableHeader = `
-                <thead>
-                  <tr>
-                    <th class="px-4 py-2">ID</th>
-                    <th class="px-4 py-2">Name</th>
-                    <th class="px-4 py-2">Email</th>
-                    <th class="px-4 py-2">Action</th>
-                  </tr>
-                </thead>
-                `;
-                break;
-              default:
-                break;
-            }
-
-            listElement.innerHTML = tableHeader;
-
-            data.forEach( item => {
-              const row = document.createElement('tr');
-
-              switch(listId) {
-                case 'user-list':
-                  row.innerHTML = `
-                    <td class="border px-4 py-2">${item.id}</td>
-                    <td class="border px-4 py-2">${item.name}</td>
-                    <td class="border px-4 py-2">${item.email}</td>
-                    <td class="border px-4 py-2">
-                      <button onclick="openEditModal('${path}', ${item.id})" class="btn">Edit</button>
-                      <button onclick="confirmDelete('${path}', ${item.id})" class="btn">Delete</button>
-                    </td>`;
-                    break;
-                default:
-                  break;
-              }
-
-              listElement.appendChild(row);
-            });
-
-            if(selectId) {
-              const selectElement = document.getElementById(selectId);
-              selectElement.innerHTML = '';
-              data.forEach( item => {
-                const option = document.createElement('option');
-                option.value = item.id;
-                option.text = item.name;
-                selectElement.appendChild(option);
-              });
-            }
-
-          } catch (error) {
-            console.error('Error:', error);
-          }
-        }
-      // fetchData end
-
-
       // fetch data on page load
       fetchData('/users', 'user-list');
+      fetchData('/courses', 'course-list');
+      fetchData('/lessons', 'lesson-list', 'attendance-lesson-id');
+      fetchData('/attendances', 'attendance-list', ["attendance-course-id", "attendance-user-id"]);
+      fetchData('/scores', 'score-list');
     </script>
   </body>
 </html>
