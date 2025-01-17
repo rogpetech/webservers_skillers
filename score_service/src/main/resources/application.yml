@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: score_service
+server:
+  port: ${SPRINGBOOT_PORT}
+
+logging:
+  level:
+  	root: ERROR
+    org.springframework.web: ERROR

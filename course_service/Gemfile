@@ -11,3 +11,4 @@ gem 'logger'
 
 gem "rake"
 gem 'rackup'
+gem 'dotenv'
