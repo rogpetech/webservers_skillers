@@ -1,15 +1,28 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"strings"
+
+	"github.com/joho/godotenv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 )
 
 func main() {
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	router := gin.Default()
+
+	// CORS
+	router.Use(corsMiddleware())
 	router.GET("/ping", func(context *gin.Context) {
 		context.JSON(http.StatusOK, gin.H{
 			"message": "pong",
@@ -50,8 +63,8 @@ func main() {
 	router.POST("/scores", proxyRequest("http://localhost:8080/scores"))
 	router.PUT("/scores/:id", proxyRequest("http://localhost:8080/scores/:id"))
 	router.DELETE("/scores/:id", proxyRequest("http://localhost:8080/scores/:id"))
-
-	router.Run(":8087")
+	port := fmt.Sprintf(":%s", os.Getenv("GO_PORT"))
+	router.Run(port)
 }
 
 func proxyRequest(url string) gin.HandlerFunc {
@@ -85,5 +98,21 @@ func proxyRequest(url string) gin.HandlerFunc {
 		}
 
 		ctx.Data(resp.StatusCode(), resp.Header().Get("Content-Type"), resp.Body())
+	}
+}
+
+func corsMiddleware() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		context.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		context.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		context.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		context.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept, X-Requested-With, Authrization")
+
+		if context.Request.Method == "OPTIONS" {
+			context.AbortWithStatus(204)
+			return
+		}
+
+		context.Next()
 	}
 }
